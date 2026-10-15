@@ -43,8 +43,11 @@ NEW_ISSUE_URL = (
 )
 
 # The keys are the source's ``label_*`` names. ``label_failed`` and
-# ``label_returned_to_warehouse`` have not been seen on a live parcel; an
-# unseen name is never guessed, it falls back (see :func:`map_parcel_status`).
+# ``label_returned_to_warehouse`` come from the carrier's own vocabulary but
+# have not been seen on a live parcel; their canonical status is unambiguous,
+# so they are mapped rather than left to the fallback. A name that is not in
+# the carrier's vocabulary at all is never guessed — it falls back and warns
+# (see :func:`map_parcel_status`).
 _STATUS_MAP: dict[str, ParcelStatus] = {
     "label_created": ParcelStatus.REGISTERED,
     "label_scanned": ParcelStatus.IN_TRANSIT,
