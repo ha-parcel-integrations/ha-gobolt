@@ -44,7 +44,7 @@ Part of the [ha-parcel-integrations](https://ha-parcel-integrations.github.io/) 
 
 ## Requirements
 
-- Home Assistant 2024.12 or newer
+- Home Assistant 2025.12 or newer
 - A GoBolt parcel and its tracking code, as issued by the retailer who sent
   it — no account and no postal code needed
 
