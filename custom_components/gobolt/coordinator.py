@@ -128,6 +128,8 @@ class GoBoltCoordinator(DataUpdateCoordinator[list[dict]]):
     active (not-yet-delivered) parcels, ``self.delivered`` the rest.
     """
 
+    config_entry: ConfigEntry
+
     def __init__(
         self,
         hass: HomeAssistant,
