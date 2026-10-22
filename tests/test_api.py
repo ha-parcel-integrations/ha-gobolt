@@ -1,14 +1,12 @@
 """Tests for the GoBolt API client."""
+
 import json
 from unittest.mock import AsyncMock, MagicMock
 
 import aiohttp
 import pytest
 
-from custom_components.gobolt.api import (
-    GoBoltApiClient,
-    GoBoltApiError,
-)
+from custom_components.gobolt.api import GoBoltApiClient, GoBoltApiError
 from custom_components.gobolt.const import TRACKING_API_URL
 
 from .payloads import delivered_sample
@@ -102,7 +100,9 @@ async def test_429_carries_retry_after_seconds():
     assert err.value.retry_after == 120.0
 
 
-@pytest.mark.parametrize("headers", [{}, {"Retry-After": "Wed, 21 Oct 2026 07:28:00 GMT"}])
+@pytest.mark.parametrize(
+    "headers", [{}, {"Retry-After": "Wed, 21 Oct 2026 07:28:00 GMT"}]
+)
 async def test_429_without_seconds_has_no_retry_after(headers):
     client = GoBoltApiClient(_session_returning(429, {}, headers))
     with pytest.raises(GoBoltApiError) as err:

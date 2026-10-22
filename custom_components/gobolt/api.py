@@ -1,4 +1,5 @@
 """GoBolt public tracking API client."""
+
 from __future__ import annotations
 
 import logging
@@ -60,10 +61,14 @@ class GoBoltApiClient:
             if status == 429:
                 retry_after_header = response.headers.get("Retry-After")
                 try:
-                    retry_after = float(retry_after_header) if retry_after_header else None
+                    retry_after = (
+                        float(retry_after_header) if retry_after_header else None
+                    )
                 except ValueError:
                     retry_after = None  # an HTTP-date, not seconds; let the caller's own backoff handle it
-                raise GoBoltApiError("HTTP 429", status_code=429, retry_after=retry_after)
+                raise GoBoltApiError(
+                    "HTTP 429", status_code=429, retry_after=retry_after
+                )
             if status not in (200, 404):
                 raise GoBoltApiError(f"HTTP {status}", status_code=status)
             try:
@@ -76,11 +81,16 @@ class GoBoltApiClient:
                 raise GoBoltApiError(f"unparseable body ({err})") from err
 
         if not isinstance(payload, dict):
-            raise GoBoltApiError("unexpected body (not a JSON object)", status_code=status)
+            raise GoBoltApiError(
+                "unexpected body (not a JSON object)", status_code=status
+            )
 
         if status == 404:
             message = payload.get("message")
-            if isinstance(message, str) and message.strip().lower() == _NOT_FOUND_MESSAGE:
+            if (
+                isinstance(message, str)
+                and message.strip().lower() == _NOT_FOUND_MESSAGE
+            ):
                 return None
             raise GoBoltApiError("HTTP 404", status_code=404)
 

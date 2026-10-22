@@ -1,4 +1,5 @@
 """Tests for the GoBolt refresh button."""
+
 from unittest.mock import AsyncMock, MagicMock
 
 from custom_components.gobolt.button import GoBoltRefreshButton

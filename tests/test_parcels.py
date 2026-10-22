@@ -4,7 +4,8 @@ These need no Home Assistant instance — the whole point of keeping
 ``parcels.py`` free of I/O is that the carrier-specific mapping (the part you
 rewrite per carrier) can be tested as plain functions.
 """
-from datetime import datetime, timedelta, timezone
+
+from datetime import UTC, datetime, timedelta
 
 import pytest
 from pytest_homeassistant_custom_component.common import MockConfigEntry
@@ -45,7 +46,7 @@ def _fresh_warning_state():
 
 
 @pytest.mark.parametrize(
-    "code,expected",
+    ("code", "expected"),
     [
         ("label_created", ParcelStatus.REGISTERED),
         ("label_scanned", ParcelStatus.IN_TRANSIT),
@@ -102,7 +103,7 @@ def test_map_event_status_missing_and_unmapped_are_none_and_silent(caplog):
 def test_parse_iso_handles_z_naive_and_garbage():
     assert parse_iso("2026-04-29T13:12:42Z").tzinfo is not None
     # A naive value is assumed UTC so mixed lists still sort.
-    assert parse_iso("2026-04-29T13:12:42").tzinfo == timezone.utc
+    assert parse_iso("2026-04-29T13:12:42").tzinfo == UTC
     assert parse_iso("not-a-date") is None
     assert parse_iso(None) is None
 
@@ -249,12 +250,19 @@ def test_capabilities_match_what_normalize_parcel_actually_returns():
     active = normalize_parcel(active_sample())
     with_history = normalize_parcel(delivered_sample(), include_history=True)
 
-    assert CAPABILITIES == {"history", "delivery_window"}
+    assert {"history", "delivery_window"} == CAPABILITIES
     assert with_history["history"] is not None
     assert active["planned_from"] is not None
     assert not PENDING_CAPABILITIES
     for parcel in (delivered, active):
-        for key in ("sender", "receiver", "pickup_point", "url", "weight", "dimensions"):
+        for key in (
+            "sender",
+            "receiver",
+            "pickup_point",
+            "url",
+            "weight",
+            "dimensions",
+        ):
             assert parcel[key] is None, key
         assert parcel["planned_to"] is None
         assert parcel["pickup"] is False
@@ -398,7 +406,7 @@ def _entry(filter_type: str, amount: int) -> MockConfigEntry:
 
 
 def _delivered_pair() -> list[dict]:
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     return [
         {"barcode": "RECENT", "delivered_at": (now - timedelta(days=1)).isoformat()},
         {"barcode": "OLD", "delivered_at": (now - timedelta(days=30)).isoformat()},
