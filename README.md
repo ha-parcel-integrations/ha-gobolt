@@ -119,7 +119,9 @@ Standard HA removal applies: **Settings → Devices & Services → GoBolt → �
 | `sensor.gobolt_incoming_parcels` | Number of active tracked parcels, full list under the `parcels` attribute |
 | `sensor.gobolt_parcel_<code>` | One per tracked parcel; state is the canonical status, attributes carry the full normalised parcel |
 | `sensor.gobolt_next_delivery` | Earliest expected delivery moment across all active parcels |
+| `sensor.gobolt_awaiting_pickup` | Incoming parcels that are ready to collect at a pickup point |
 | `sensor.gobolt_delivered_parcels` | Recently delivered parcels (see the retention option) |
+| `calendar.gobolt_deliveries` | Read-only calendar of expected deliveries, no extra API calls |
 | `sensor.gobolt_last_successful_update` | Diagnostic: when GoBolt was last polled successfully |
 
 A delivered parcel moves from its per-parcel sensor to the delivered sensor automatically.
@@ -186,7 +188,7 @@ logger:
 ## Troubleshooting
 
 - **A parcel shows `unknown`** — GoBolt does not know the code (yet), or it was mistyped. It will pick up automatically once GoBolt registers it.
-- **A status logs "Unrecognised GoBolt status"** — please [open an issue](https://github.com/ha-parcel-integrations/ha-gobolt/issues/new) with the logged line so the mapping can be extended.
+- **A status logs "Unrecognised GoBolt status"** — please [open an issue](https://github.com/ha-parcel-integrations/ha-gobolt/issues/new?template=unrecognised_status.yml) with the logged line so the mapping can be extended.
 
 ## Related integrations
 
