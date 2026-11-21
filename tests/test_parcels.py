@@ -257,7 +257,7 @@ def test_capabilities_match_what_normalize_parcel_actually_returns():
     assert {"history", "delivery_window"} == CAPABILITIES
     assert with_history["history"] is not None
     assert active["planned_from"] is not None
-    assert not PENDING_CAPABILITIES
+    assert {"pickup_point"} == PENDING_CAPABILITIES
     for parcel in (delivered, active):
         for key in (
             "sender",
@@ -268,7 +268,6 @@ def test_capabilities_match_what_normalize_parcel_actually_returns():
             "dimensions",
         ):
             assert parcel[key] is None, key
-        assert parcel["planned_to"] is None
         assert parcel["pickup"] is False
 
 
@@ -307,13 +306,13 @@ def test_normalize_history_is_opt_in():
     assert parcel["history"][0]["status"] == ParcelStatus.REGISTERED
 
 
-def test_normalize_active_parcel_has_a_point_eta_only():
+def test_normalize_active_parcel_has_a_whole_day_eta():
     parcel = normalize_parcel(active_sample())
     assert parcel["status"] == ParcelStatus.OUT_FOR_DELIVERY
     assert parcel["delivered"] is False
     assert parcel["delivered_at"] is None
-    assert parcel["planned_from"] == "2026-04-29T12:00:00.000-04:00"
-    assert parcel["planned_to"] is None
+    assert parcel["planned_from"] == "2026-04-29T00:00:00-04:00"
+    assert parcel["planned_to"] == "2026-04-29T23:59:59-04:00"
 
 
 def test_normalize_without_optional_fields():

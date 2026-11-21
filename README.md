@@ -118,7 +118,7 @@ Standard HA removal applies: **Settings → Devices & Services → GoBolt → �
 |---|---|
 | `sensor.gobolt_incoming_parcels` | Number of active tracked parcels, full list under the `parcels` attribute |
 | `sensor.gobolt_parcel_<code>` | One per tracked parcel; state is the canonical status, attributes carry the full normalised parcel |
-| `sensor.gobolt_next_delivery` | Earliest expected delivery moment across all active parcels |
+| `sensor.gobolt_next_delivery` | Earliest expected delivery day across all active parcels whose delivery day has not passed |
 | `sensor.gobolt_en_route_to_pickup_point` | Incoming parcels on their way to a pickup point that have not arrived yet |
 | `sensor.gobolt_awaiting_pickup` | Incoming parcels that are ready to collect at a pickup point |
 | `sensor.gobolt_delivered_parcels` | Recently delivered parcels (see the retention option) |
@@ -141,7 +141,7 @@ The `status` field is the carrier-agnostic enum shared by the whole integration 
 | `problem` | GoBolt reports a failed delivery |
 | `unknown` | Not found yet, or a status we have not mapped yet |
 
-GoBolt does not report pickup points, so `at_pickup_point` never occurs. Only
+No pickup-point status has been seen on a real parcel yet, so `at_pickup_point` has not occurred and the two pickup sensors read 0. Only
 delivered parcels have been confirmed against real data so far: `problem` and
 `returning` come from GoBolt's own tracking page and have not been seen live.
 

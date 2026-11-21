@@ -427,8 +427,8 @@ async def test_fires_delivery_time_changed_event(hass):
     await hass.async_block_till_done()
 
     assert len(events) == 1
-    assert events[0].data["old_planned_from"] == "2026-04-29T12:00:00.000-04:00"
-    assert events[0].data["new_planned_from"] == "2026-04-30T12:00:00.000-04:00"
+    assert events[0].data["old_planned_from"] == "2026-04-29T00:00:00-04:00"
+    assert events[0].data["new_planned_from"] == "2026-04-30T00:00:00-04:00"
 
 
 async def test_losing_the_eta_is_silent(hass):

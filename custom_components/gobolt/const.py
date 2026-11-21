@@ -41,7 +41,7 @@ KNOWN_CAPABILITIES = frozenset(
 # receiver, pickup point, weight, dimensions or deep link.
 CAPABILITIES = frozenset({"history", "delivery_window"})
 
-PENDING_CAPABILITIES: frozenset[str] = frozenset()
+PENDING_CAPABILITIES: frozenset[str] = frozenset({"pickup_point"})
 
 # If this carrier ever grows a second backend with a genuinely different
 # payload shape (a country-specific API, not just a config option), replace

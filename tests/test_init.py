@@ -36,6 +36,12 @@ async def test_setup_and_unload(hass):
     assert incoming is not None
     assert incoming.state == "1"
 
+    # Both pickup summaries register and read 0 until a pickup parcel shows up.
+    for name in ("en_route_to_pickup_point", "awaiting_pickup"):
+        state = hass.states.get(f"sensor.gobolt_{name}")
+        assert state is not None
+        assert state.state == "0"
+
     # Services registered on setup...
     assert hass.services.has_service(DOMAIN, "track_parcel")
 
@@ -143,3 +149,33 @@ async def test_options_update_applies_live_without_reload(hass):
 
     incoming = hass.states.get("sensor.gobolt_incoming_parcels")
     assert incoming.state == "2"
+
+
+async def test_pickup_sensors_are_not_swept_as_stale(hass):
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        unique_id=DOMAIN,
+        options={CONF_PARCELS: [{CONF_TRACKING_CODE: ACTIVE_CODE}]},
+    )
+    entry.add_to_hass(hass)
+    registry = er.async_get(hass)
+    for suffix in ("awaiting_pickup", "en_route_to_pickup_point"):
+        registry.async_get_or_create(
+            "sensor",
+            DOMAIN,
+            f"{entry.entry_id}_{suffix}",
+            config_entry=entry,
+            suggested_object_id=f"gobolt_{suffix}",
+        )
+
+    with patch(
+        "custom_components.gobolt.api.GoBoltApiClient.async_get_parcel",
+        new=AsyncMock(return_value=_sample()),
+    ):
+        assert await hass.config_entries.async_setup(entry.entry_id)
+        await hass.async_block_till_done()
+
+    for suffix in ("awaiting_pickup", "en_route_to_pickup_point"):
+        assert registry.async_get_entity_id(
+            "sensor", DOMAIN, f"{entry.entry_id}_{suffix}"
+        )

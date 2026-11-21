@@ -35,11 +35,10 @@ you act in one of these areas:
   summary+diagnostic sensors. Add a new non-parcel sensor's unique_id to the set.
 - **Per-parcel sensors are removed by the summary sensor** via
   `entity_registry.async_remove` (self-removal races and leaves ghosts).
-- **The optional pickup-point summaries are a pair.** A carrier that can tell
-  a parcel is destined for a pickup point exposes
-  `en_route_to_pickup_point` for `pickup is true` before it arrives; one that
-  can reach `ParcelStatus.AT_PICKUP_POINT` also exposes `awaiting_pickup`.
-  See *Parcel contract* in `CONVENTIONS.md`. Say "pickup point", not
+- **The pickup-point summaries are a pair.** A carrier that can deliver to a
+  pickup point exposes both `en_route_to_pickup_point` and `awaiting_pickup`,
+  and this one does even though no parcel has shown a pickup point yet. See *Parcel contract* in
+  `CONVENTIONS.md`. Say "pickup point", not
   "ServicePoint"/"parcel shop"/"locker", for the generic concept; the
   example carrier demonstrates both canonical sensors.
 
@@ -71,13 +70,19 @@ you act in one of these areas:
   step's timestamp; set only when delivered.
 - **ETA:** `estimated_delivery_date` is a day-level estimate encoded as an
   instant (nominal 12:00, -04:00 offset regardless of where the parcel is), so
-  it goes into `planned_from` only; `planned_to` is always `None`. Cleared on
-  delivery, the way ha-dhl-nl does it. It has so far only been observed on a
+  the day is taken in the value's own offset and the window is that whole day:
+  `planned_from` 00:00:00, `planned_to` 23:59:59, both in that offset. Emptied
+  at `delivered` and `returning`. It has so far only been observed on a
   delivered parcel; the maintainer's ruling is that an in-flight parcel
   carries it too, so `delivery_window` is claimed outright rather than left
   pending. If an in-flight parcel ever comes back without one, that ruling is
   what to revisit.
-- **`None` on purpose:** sender, receiver, `planned_to`, pickup point, weight,
+- **Pickup:** `pickup` is `is_pickup(None, status, event_statuses)`: true once
+  the status or any history step maps to `at_pickup_point`. `pickup_point` is
+  `None` unless a real name exists. Both pickup sensors exist and read 0.
+  Pending evidence: no pickup-point status or flag has been seen on a real
+  parcel yet; move it into `CAPABILITIES` once one confirms it.
+- **`None` on purpose:** sender, receiver, pickup point, weight,
   dimensions and `url` (no deep link to a specific code is known).
   `CAPABILITIES` is `history` + `delivery_window`.
 - **`raw`** is the complete response. Privacy lives in `diagnostics.py`: the
