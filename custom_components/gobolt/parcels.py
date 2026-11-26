@@ -380,6 +380,7 @@ def normalize_parcel(
         "barcode": barcode,
         "sender": None,
         "receiver": None,
+        "contents": None,
         "status": status,
         "raw_status": label_status,
         "delivered": delivered,

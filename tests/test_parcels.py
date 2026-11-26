@@ -215,6 +215,7 @@ CANONICAL_KEYS = [
     "barcode",
     "sender",
     "receiver",
+    "contents",
     "status",
     "raw_status",
     "delivered",
@@ -262,6 +263,7 @@ def test_capabilities_match_what_normalize_parcel_actually_returns():
         for key in (
             "sender",
             "receiver",
+            "contents",
             "pickup_point",
             "url",
             "weight",

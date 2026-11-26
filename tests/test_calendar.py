@@ -19,11 +19,18 @@ def _coordinator(data: list[dict]) -> MagicMock:
 
 
 def _parcel(
-    barcode, planned_from=None, planned_to=None, pickup=False, pickup_point=None
+    barcode,
+    planned_from=None,
+    planned_to=None,
+    pickup=False,
+    pickup_point=None,
+    contents=None,
+    sender="Example Sender",
 ):
     return {
         "barcode": barcode,
-        "sender": "Example Sender",
+        "sender": sender,
+        "contents": contents,
         "status": "out_for_delivery",
         "planned_from": planned_from,
         "planned_to": planned_to,
@@ -47,6 +54,16 @@ def test_event_returns_earliest_upcoming():
     event = cal.event
     assert event.uid == "SOON"
     assert event.summary == "Example Sender"
+
+
+def test_event_title_prefers_contents_then_sender_then_fallback():
+    when = "2099-01-01T10:00:00Z"
+    assert _cal([_parcel("A", when, contents="Running shoes")]).event.summary == (
+        "Running shoes"
+    )
+    assert _cal([_parcel("A", when)]).event.summary == "Example Sender"
+    assert _cal([_parcel("A", when, sender=None)]).event.summary == "Parcel A"
+    assert _cal([_parcel("", when, sender=None)]).event.summary == "GoBolt parcel"
 
 
 def test_event_none_when_no_planned():
